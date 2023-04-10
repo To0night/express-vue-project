@@ -1,4 +1,4 @@
-# express-vue
+# express+vue
 
 - 本项目前端是由 vite 搭建的 vue 项目，后端是由 express 开发的接口
 - client 是前端项目通过 npm run dev 启动
