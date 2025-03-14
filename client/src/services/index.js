@@ -13,3 +13,51 @@ export function getStudents(type, score) {
 			});
 	});
 }
+
+export function getData() {
+	return new Promise((resolve, reject) => {
+		axios
+			.get('/api/getData', {
+				params: { type: 'number' }
+			})
+			.then((res) => {
+				resolve(res.data);
+			})
+			.catch((err) => {
+				reject(err);
+			});
+	});
+}
+
+
+export function get404Data() {
+	return new Promise((resolve, reject) => {
+		axios
+			.get('/api/get404Data', {
+				params: { type: 'number' }
+			})
+			.then((res) => {
+				resolve(res.data);
+			})
+			.catch((err) => {
+				reject(err);
+			});
+	});
+}
+
+
+
+export function get403Data() {
+	return new Promise((resolve, reject) => {
+		axios
+			.get('/api/get403Data', {
+				params: { type: 'number' }
+			})
+			.then((res) => {
+				resolve(res.data);
+			})
+			.catch((err) => {
+				reject(err);
+			});
+	});
+}
