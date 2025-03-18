@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button @click="getData">get</button>
+        <button id="getBtn" @click="getData">get</button>
         <button @click="postStudent">post</button>
         <button @click="get404Data">404</button>
         <button @click="get403Data">403</button>
@@ -16,6 +16,7 @@ export default {
     },
     methods: {
         getData() {
+            console.log('getData', 11111111111111111);
             getData()
         },
         postStudent() {

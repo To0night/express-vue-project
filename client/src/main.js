@@ -5,6 +5,7 @@ import router from './router/router'
 import './utils/observe'
 import './utils/XMLhttp'
 import './utils/fetch'
+import './utils/clickIntercept'
 
 const app = createApp(App);
 app.use(router); // 使用路由

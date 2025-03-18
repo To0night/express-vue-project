@@ -39,9 +39,14 @@ const routes = [
 
 // 创建路由实例
 const router = createRouter({
-    history: createWebHashHistory(),
-    // history: createWebHistory(),
+    // history: createWebHashHistory(),
+    history: createWebHistory(),
     routes, // 路由规则
 });
 
 export default router;
+
+
+
+
+

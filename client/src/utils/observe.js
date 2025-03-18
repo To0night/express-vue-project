@@ -31,36 +31,40 @@
 // })()
 
 // 方案二
-// function onNotFound(callback) {
+// (function () {
+//     console.log('监听页面url变化');
 //     const observer = new MutationObserver(() => {
-//         if (document.body.innerText.includes("404")) {
-//             console.log("检测到 404 页面，触发订阅");
-//             callback();
+//         if (window.location.href.includes("/reservations/booking-summary")) {
+//             console.log("检测到错误页面，触发订阅");
+//             window.alert('检测到错误页面，触发订阅')
 //             observer.disconnect(); // 停止监听
 //         }
 //     });
 
 //     function restartObserver() {
-//         setTimeout(() => {
-//             if (!document.body.innerText.includes("404")) {
-//                 console.log("页面恢复，重新启用监听");
-//                 observer.observe(document.body, { childList: true, subtree: true });
-//             }
-//         }, 500);
+//         if (document.body.innerText.includes("/reservations/booking-summary")) {
+//             console.log("页面恢复，重新启用监听");
+//             observer.observe(document.body, { childList: true, subtree: true });
+//         }
 //     }
 
 //     observer.observe(document.body, { childList: true, subtree: true });
 
 //     const originalPushState = history.pushState;
 //     history.pushState = function (...args) {
+//         const previousHref = window.location.href;
 //         originalPushState.apply(this, args);
-//         restartObserver();
+//         if (previousHref !== window.location.href) {
+//             restartObserverDebounced();
+//         }
 //     };
-
 //     const originalReplaceState = history.replaceState;
 //     history.replaceState = function (...args) {
+//         const previousHref = window.location.href;
 //         originalReplaceState.apply(this, args);
-//         restartObserver();
+//         if (previousHref !== window.location.href) {
+//             restartObserverDebounced();
+//         }
 //     };
 
 //     window.addEventListener("popstate", restartObserver);
@@ -70,12 +74,8 @@
 //         console.log("页面即将关闭，移除 MutationObserver 监听");
 //         observer.disconnect();
 //     });
-// }
+// })()
 
-// // 使用订阅
-// onNotFound(() => {
-//     console.log("订阅触发：用户进入 404 页面");
-// });
 
 // 方案三
 // (function () {
@@ -169,83 +169,131 @@
 //     console.log(result, 1111);
 // })()
 
-(function () {
-    // 验证 href 是否有效
-    function validateHref(element) {
-        const href = element.href;
-        if (!href) return;
-        // 模拟验证（实际项目中可以使用 fetch 或 XMLHttpRequest）
-        fetch(href, { method: 'HEAD' })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('资源加载失败');
-                }
-            })
-            .catch((error) => {
-                console.warn('资源加载失败:', href);
-                detectedFailures++;
-                showDefaultPage();
+// (function () {
+//     // 验证 href 是否有效
+//     function validateHref(element) {
+//         const href = element.href;
+//         if (!href) return;
+//         // 模拟验证（实际项目中可以使用 fetch 或 XMLHttpRequest）
+//         fetch(href, { method: 'HEAD' })
+//             .then((response) => {
+//                 if (!response.ok) {
+//                     throw new Error('资源加载失败');
+//                 }
+//             })
+//             .catch((error) => {
+//                 console.warn('资源加载失败:', href);
+//                 detectedFailures++;
+//                 showDefaultPage();
 
-                // 替换为缺省内容
-                if (element.tagName === 'A') {
-                    element.textContent = '链接无效，点击返回首页';
-                    element.href = '/';
-                } else if (element.tagName === 'LINK') {
-                    element.remove(); // 移除无效的样式表
-                }
-            });
-    }
-    // 递归搜素a标签
-    function findAndHandleTags(node, result = []) {
-        if (node.tagName === 'A' && node.href) {
-            validateHref(node)
-        }
-        // 递归遍历子节点
-        for (const child of node?.children || []) {
-            child && findAndHandleTags(child, result);
-        }
-    }
-    // 创建 MutationObserver 实例
-    const observer = new MutationObserver((mutationsList, observer) => {
-        for (const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(node => {
-                    console.log(node, '节点node');
-                    // 验证a标签
-                    findAndHandleTags(node)
-                })
-            }
+//                 // 替换为缺省内容
+//                 if (element.tagName === 'A') {
+//                     element.textContent = '链接无效，点击返回首页';
+//                     element.href = '/';
+//                 } else if (element.tagName === 'LINK') {
+//                     element.remove(); // 移除无效的样式表
+//                 }
+//             });
+//     }
+//     // 递归搜素a标签
+//     function findAndHandleTags(node, result = []) {
+//         if (node.tagName === 'A' && node.href) {
+//             validateHref(node)
+//         }
+//         // 递归遍历子节点
+//         for (const child of node?.children || []) {
+//             child && findAndHandleTags(child, result);
+//         }
+//     }
+//     // 创建 MutationObserver 实例
+//     const observer = new MutationObserver((mutationsList, observer) => {
+//         for (const mutation of mutationsList) {
+//             if (mutation.type === 'childList') {
+//                 mutation.addedNodes.forEach(node => {
+//                     console.log(node, '节点node');
+//                     // 验证a标签
+//                     findAndHandleTags(node)
+//                 })
+//             }
 
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+//         }
+//     });
+//     observer.observe(document.body, { childList: true, subtree: true });
 
-    function restartObserver() {
-        setTimeout(() => {
-            if (!document.body.innerText.includes("404")) {
-                console.log("页面恢复，重新启用监听");
-                observer.observe(document.body, { childList: true, subtree: true });
-            }
-        }, 500);
-    }
+//     function restartObserver() {
+//         setTimeout(() => {
+//             if (!document.body.innerText.includes("404")) {
+//                 console.log("页面恢复，重新启用监听");
+//                 observer.observe(document.body, { childList: true, subtree: true });
+//             }
+//         }, 500);
+//     }
 
-    const originalPushState = history.pushState;
-    history.pushState = function (...args) {
-        originalPushState.apply(this, args);
-        restartObserver();
-    };
+//     const originalPushState = history.pushState;
+//     history.pushState = function (...args) {
+//         originalPushState.apply(this, args);
+//         restartObserver();
+//     };
 
-    const originalReplaceState = history.replaceState;
-    history.replaceState = function (...args) {
-        originalReplaceState.apply(this, args);
-        restartObserver();
-    };
+//     const originalReplaceState = history.replaceState;
+//     history.replaceState = function (...args) {
+//         originalReplaceState.apply(this, args);
+//         restartObserver();
+//     };
 
-    window.addEventListener("popstate", restartObserver);
+//     window.addEventListener("popstate", restartObserver);
 
-    // 退出页面时，移除监听
-    window.addEventListener("beforeunload", () => {
-        console.log("页面即将关闭，移除 MutationObserver 监听");
-        observer.disconnect();
-    });
-})()
+//     // 退出页面时，移除监听
+//     window.addEventListener("beforeunload", () => {
+//         console.log("页面即将关闭，移除 MutationObserver 监听");
+//         observer.disconnect();
+//     });
+// })()
+
+// 方案四 只通过监听页面路径变化来调整页面
+// (function () {
+//     console.log('restartObserver');
+//     let lastExecutionTime = 0;
+//     const debounceTime = 1000; // 防抖时间
+//     // 防抖函数
+//     function restartObserverDebounced() {
+//         const now = Date.now();
+//         console.log(now, lastExecutionTime, debounceTime, 123456);
+//         if (now - lastExecutionTime < debounceTime) {
+//             console.log('restartObserverDebounced');
+//             return;
+//         }
+//         lastExecutionTime = Date.now();
+//         restartObserver();
+//     }
+//     function restartObserver() {
+//         setTimeout(() => {
+//             if (window.location.href.includes("/404")) {
+//                 console.log('支付错误页面', window.location.href);
+//                 window.alert('error Page:' + window.location.href)
+//                 // console.log("页面恢复，重新启用监听");
+//                 // observer.observe(document.body, { childList: true, subtree: true });
+//             }
+//         }, 500);
+//     }
+//     const originalPushState = history.pushState;
+//     history.pushState = function (...args) {
+//         originalPushState.apply(this, args);
+//         restartObserverDebounced();
+//     };
+//     const originalReplaceState = history.replaceState;
+//     history.replaceState = function (...args) {
+//         originalReplaceState.apply(this, args);
+//         restartObserverDebounced();
+//     };
+
+//     window.addEventListener("hashchange", restartObserverDebounced); // 监听 hash 变化
+//     window.addEventListener("popstate", restartObserverDebounced); // 监听前进、后退
+//     // 退出页面时，移除监听
+//     window.addEventListener("beforeunload", () => {
+//         console.log("页面即将关闭，移除监听");
+//         // observer.disconnect();
+//         window.removeEventListener("hashchange", restartObserverDebounced);
+//         window.removeEventListener("popstate", restartObserverDebounced);
+//     });
+// })()
